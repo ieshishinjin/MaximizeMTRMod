@@ -8,8 +8,9 @@
 		"ieshishinjin"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"homepage": "https://github.com/ieshishinjin/MaximizeMTRMod",
+		"sources": "https://github.com/ieshishinjin/MaximizeMTRMod",
+        "issues": "https://github.com/ieshishinjin/MaximizeMTRMod/issues"
 	},
 	"license": "MIT",
 	"icon": "assets/mmtr/icon.png",
