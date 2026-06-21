@@ -23,33 +23,33 @@ public class MmtrConfig {
 
     // 列车在此距离内渲染完整模型（车身、内饰、灯光全部绘制）；
     // 超过此距离但未达到 vehicleMaxRenderDistance 时仅渲染外壳
-    public int vehicleFullRenderDistance = 64;
+    public int vehicleFullRenderDistance = 40;
 
     // 列车超过此距离后完全停止渲染，不产生任何 GPU 开销。
     // 此值配合帧交错（distantVehicleFrameCycle）可进一步降频
-    public int vehicleMaxRenderDistance = 256;
+    public int vehicleMaxRenderDistance = 128;
 
     // 屏蔽门（PSD/APG）、信号机、PIDS 显示屏、站名牌等方块实体的最大渲染距离。
     // 地铁站内方块实体密集，过大距离会导致大量 draw call
-    public int blockEntityMaxRenderDistance = 128;
+    public int blockEntityMaxRenderDistance = 56;
 
     // 电梯井的最大渲染距离。电梯模型面数较高但数量较少
-    public int liftMaxRenderDistance = 192;
+    public int liftMaxRenderDistance = 80;
 
     //  数据同步节流
 
     // 玩家在此距离内有列车/电梯时，保持正常的 HTTP 同步频率（每 tick）
-    public int fullSyncDistance = 64;
+    public int fullSyncDistance = 40;
 
     // 玩家在此距离内但超出 fullSyncDistance 时，使用降频同步
-    public int reducedSyncDistance = 128;
+    public int reducedSyncDistance = 80;
 
-    // 降频模式的同步间隔（tick 数）。每 20 tick ≈ 1 秒。
+    // 降频模式的同步间隔（tick 数）。每 12 tick ≈ 0.6 秒。
     // 增大此值可减少 CPU 开销，但列车位置更新会变慢
-    public int reducedSyncInterval = 20;
+    public int reducedSyncInterval = 12;
 
     // 玩家超过此距离后完全停止 HTTP 同步，直到靠近再恢复
-    public int noSyncDistance = 256;
+    public int noSyncDistance = 160;
 
     //  区块加载预测
 
