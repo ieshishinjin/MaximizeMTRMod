@@ -1,0 +1,14 @@
+{
+	"required": true,
+	"package": "io.github.mmtr.mixin",
+	"compatibilityLevel": "JAVA_17",
+	"mixins": [
+      "mmtrMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"overwrites": {
+		"requireAnnotations": true
+	}
+}

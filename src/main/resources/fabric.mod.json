@@ -1,0 +1,39 @@
+{
+	"schemaVersion": 1,
+	"id": "mmtr",
+	"version": "${version}",
+	"name": "MaximizeMTRMod",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"ieshishinjin"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "MIT",
+	"icon": "assets/mmtr/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+          "io.github.mmtr.mmtrMod"
+		],
+		"client": [
+          "io.github.mmtr.client.mmtrModClient"
+		]
+	},
+	"mixins": [
+		"mmtr.mixins.json",
+		{
+			"config": "mmtr.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.19.3",
+		"minecraft": "~1.20.4",
+		"java": ">=17",
+		"fabric-api": "*",
+        "mtr": ">=4.0.0"
+	}
+}
