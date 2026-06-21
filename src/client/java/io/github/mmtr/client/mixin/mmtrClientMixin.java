@@ -1,3 +1,6 @@
+// MaximizeMTRMod - 客户端 Mixin 模板
+// by ieshishinjin
+
 package io.github.mmtr.client.mixin;
 
 import net.minecraft.client.Minecraft;
@@ -9,7 +12,5 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Minecraft.class)
 public class mmtrClientMixin {
 	@Inject(at = @At("HEAD"), method = "run")
-	private void init(CallbackInfo info) {
-		// This code is injected into the start of Minecraft.run()V
-	}
+	private void init(CallbackInfo info) {}
 }

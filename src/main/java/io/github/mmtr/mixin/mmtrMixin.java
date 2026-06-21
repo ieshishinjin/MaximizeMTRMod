@@ -1,3 +1,6 @@
+// MaximizeMTRMod - 服务端 Mixin 模板
+// by ieshishinjin
+
 package io.github.mmtr.mixin;
 
 import net.minecraft.server.MinecraftServer;
@@ -9,7 +12,5 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(MinecraftServer.class)
 public class mmtrMixin {
 	@Inject(at = @At("HEAD"), method = "loadLevel")
-	private void init(CallbackInfo info) {
-		// This code is injected into the start of MinecraftServer.loadLevel()V
-	}
+	private void init(CallbackInfo info) {}
 }
