@@ -3,7 +3,7 @@
 	"id": "mmtr",
 	"version": "${version}",
 	"name": "MaximizeMTRMod",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "A client-side performance mod for MTR 4 that culls distant renders, throttles data sync, and smooths chunk-loading stutter",
 	"authors": [
 		"ieshishinjin"
 	],
@@ -14,7 +14,7 @@
 	},
 	"license": "MIT",
 	"icon": "assets/mmtr/icon.png",
-	"environment": "*",
+    "environment": "client",
 	"entrypoints": {
 		"main": [
           "io.github.mmtr.mmtrMod"
@@ -36,5 +36,12 @@
 		"java": ">=17",
 		"fabric-api": "*",
         "mtr": ">=4.0.0"
-	}
+	},
+    "custom": {
+      "modmenu": {
+        "links": {
+          "modmenu.modrinth": "https://modrinth.com/project/xRFVMZi3"
+        }
+      }
+    }
 }
