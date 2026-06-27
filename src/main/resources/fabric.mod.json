@@ -12,7 +12,7 @@
 		"sources": "https://github.com/ieshishinjin/MaximizeMTRMod",
         "issues": "https://github.com/ieshishinjin/MaximizeMTRMod/issues"
 	},
-	"license": "MIT",
+	"license": "GPL-3.0",
 	"icon": "assets/mmtr/icon.png",
     "environment": "client",
 	"entrypoints": {
