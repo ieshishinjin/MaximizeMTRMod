@@ -9,7 +9,8 @@
         "RenderLiftsMixin",
         "MinecraftClientDataMixin",
         "LiftAccessor",
-        "RenderRailsMixin"
+        "RenderRailsMixin",
+        "DebugOverlayMixin"
     ],
     "injectors": {
         "defaultRequire": 1

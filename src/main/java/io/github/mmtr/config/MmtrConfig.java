@@ -88,7 +88,7 @@ public class MmtrConfig {
     public boolean enableLiftCulling = true;
 
     // 启用轨道渲染剔除
-    public boolean enableRailCulling = true;
+    public boolean enableRailCulling = false;
 
     //  调试
 
