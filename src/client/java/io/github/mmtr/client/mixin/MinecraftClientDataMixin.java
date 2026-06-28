@@ -1,7 +1,7 @@
 // MaximizeMTRMod — 数据同步频率节流
 // 当玩家远离所有列车和电梯时，降低 MinecraftClientData.sync()
 // 的调用频率，减少 HTTP 请求和 CPU 开销。
-// 一旦有附近列车出现，立即恢复全速同步。
+// 手持 MTR 物品时始终保持全速同步。
 
 package io.github.mmtr.client.mixin;
 
@@ -31,6 +31,9 @@ public abstract class MinecraftClientDataMixin {
 		Player player = mc.player;
 		if (player == null) return;
 
+		// 手持 MTR 物品时不节流（玩家在操作列车/建筑轨道）
+		if (mmtr$isHoldingMtrItem(player)) return;
+
 		double px = player.getX(), pz = player.getZ();
 		MinecraftClientData self = (MinecraftClientData) (Object) this;
 
@@ -46,7 +49,6 @@ public abstract class MinecraftClientDataMixin {
 		}
 	}
 
-	// 检查全量同步距离内是否有列车或电梯
 	@Unique
 	private static boolean mmtr$hasNearbyTransit(MinecraftClientData self, double px, double pz, MmtrConfig cfg) {
 		int dist = LODUtil.adjustedDistance(cfg.fullSyncDistance);
@@ -78,5 +80,19 @@ public abstract class MinecraftClientDataMixin {
 			}
 		}
 		return false;
+	}
+
+	@Unique
+	private static boolean mmtr$isHoldingMtrItem(Player player) {
+		var main = player.getMainHandItem();
+		if (!main.isEmpty() && mmtr$isMtrNamespace(main)) return true;
+		var off = player.getOffhandItem();
+		return !off.isEmpty() && mmtr$isMtrNamespace(off);
+	}
+
+	@Unique
+	private static boolean mmtr$isMtrNamespace(net.minecraft.world.item.ItemStack stack) {
+		var id = net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem());
+		return id != null && "mtr".equals(id.getNamespace());
 	}
 }

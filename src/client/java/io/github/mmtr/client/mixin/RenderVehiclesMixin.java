@@ -1,7 +1,5 @@
-// MaximizeMTRMod — 列车渲染距离剔除 + 帧交错降频
-// 当所有列车都远离玩家时取消整个渲染调用，节省 GPU。
-// 帧交错使远处列车在部分帧上自动缩减渲染距离，
-// 相当于远处物体降频渲染，人眼无感知。
+// MaximizeMTRMod — 列车渲染距离剔除
+// 全部列车超出最大距离时跳过渲染。
 
 package io.github.mmtr.client.mixin;
 
@@ -29,8 +27,6 @@ public abstract class RenderVehiclesMixin {
 
 	@Inject(method = MMTR_TARGET, at = @At("HEAD"), cancellable = true, remap = false)
 	private static void mmtr$beforeRenderVehicles(long timerMillis, Vector3d playerPos, CallbackInfo ci) {
-		LODUtil.onFrameStart();
-
 		MmtrConfig cfg = MmtrConfig.getInstance();
 		if (!cfg.enableDistanceLOD) return;
 
@@ -43,15 +39,15 @@ public abstract class RenderVehiclesMixin {
 		MinecraftClientData data = MinecraftClientData.getInstance();
 		if (data.vehicles.isEmpty()) return;
 
-		int maxDist = LODUtil.adjustedDistance(cfg.vehicleMaxRenderDistance, true);
-		double maxDistSq = (double) maxDist * maxDist;
+		int maxDist = LODUtil.adjustedDistance(cfg.vehicleMaxRenderDistance);
+		double sq = (double) maxDist * maxDist;
 
 		for (VehicleExtension vehicle : data.vehicles) {
 			if (vehicle == null) continue;
 			Vector headPos = ((Vehicle) vehicle).getHeadPosition();
 			if (headPos == null) continue;
 			double dx = px - headPos.x, dy = py - headPos.y, dz = pz - headPos.z;
-			if (dx * dx + dy * dy + dz * dz <= maxDistSq) return;
+			if (dx * dx + dy * dy + dz * dz <= sq) return;
 		}
 		ci.cancel();
 	}

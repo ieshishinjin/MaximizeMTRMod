@@ -14,8 +14,8 @@ import java.util.List;
 @Mixin(DebugScreenOverlay.class)
 public abstract class DebugOverlayMixin {
 
-    @Inject(method = "getGameInformation", at = @At("RETURN"))
-    private void mmtr$onGameInfo(CallbackInfoReturnable<List<String>> cir) {
+    @Inject(method = "getSystemInformation", at = @At("RETURN"))
+    private void mmtr$onSystemInfo(CallbackInfoReturnable<List<String>> cir) {
         List<String> lines = cir.getReturnValue();
         if (lines != null) {
             lines.addAll(MmtrDebugHud.getLines());

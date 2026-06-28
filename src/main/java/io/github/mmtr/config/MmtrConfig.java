@@ -60,12 +60,12 @@ public class MmtrConfig {
     // 沿列车前进方向预检测的区块数量（前方最多 N 个区块）
     public int preloadChunkCount = 5;
 
-    //  渲染帧交错（频率降级）
+    //  渲染帧交错（实验性 — 默认关闭）
 
-    // 启用后，远处列车在部分帧上自动缩减渲染距离，
-    // 相当于让远处物体每隔 N 帧才完整渲染一次。
-    // 人眼对远处细节不敏感，此优化几乎无感知但 GPU 减半
-    public boolean enableRenderFrequencyReduction = true;
+    // 启用后每隔 N 帧跳过列车渲染，降低列车动画帧率以节省 GPU。
+    // 所有列车同步降帧，不会闪烁，但近距离列车也会变卡顿。
+    // 此功能效果有限，默认关闭。
+    public boolean enableRenderFrequencyReduction = false;
 
     // 帧交错周期：
     //   2 = 隔帧降距（远处列车每 2 帧完全渲染一次）
@@ -88,7 +88,7 @@ public class MmtrConfig {
     public boolean enableLiftCulling = true;
 
     // 启用轨道渲染剔除
-    public boolean enableRailCulling = false;
+    public boolean enableRailCulling = true;
 
     //  调试
 
