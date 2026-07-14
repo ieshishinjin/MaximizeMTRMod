@@ -6,6 +6,7 @@
 package io.github.mmtr.client.mixin;
 
 import io.github.mmtr.client.lod.LODUtil;
+import io.github.mmtr.client.util.MtrItemUtil;
 import io.github.mmtr.config.MmtrConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
@@ -32,7 +33,7 @@ public abstract class RenderRailsMixin {
 		Player player = mc.player;
 		if (player == null) return;
 
-		if (mmtr$isHoldingMtrItem(player)) return;
+		if (MtrItemUtil.isHoldingMtrItem(player)) return;
 
 		MinecraftClientData data = MinecraftClientData.getInstance();
 		if (data.railWrapperList == null || data.railWrapperList.isEmpty()) {
@@ -41,7 +42,7 @@ public abstract class RenderRailsMixin {
 		}
 
 		double px = player.getX(), pz = player.getZ();
-		int maxDist = LODUtil.adjustedDistance(128);
+		int maxDist = LODUtil.adjustedDistance(cfg.railMaxRenderDistance);
 		double maxDistSq = (double) maxDist * maxDist;
 
 		for (var wrapper : data.railWrapperList.values()) {
@@ -52,20 +53,5 @@ public abstract class RenderRailsMixin {
 			if (ev != null && (px - ev.x) * (px - ev.x) + (pz - ev.z) * (pz - ev.z) <= maxDistSq) return;
 		}
 		ci.cancel();
-	}
-
-	// 检查主手或副手是否持有 mtr 命名空间的物品
-	@Unique
-	private static boolean mmtr$isHoldingMtrItem(Player player) {
-		var main = player.getMainHandItem();
-		if (!main.isEmpty() && mmtr$isMtrNamespace(main)) return true;
-		var off = player.getOffhandItem();
-		return !off.isEmpty() && mmtr$isMtrNamespace(off);
-	}
-
-	@Unique
-	private static boolean mmtr$isMtrNamespace(net.minecraft.world.item.ItemStack stack) {
-		var id = net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem());
-		return id != null && "mtr".equals(id.getNamespace());
 	}
 }

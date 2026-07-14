@@ -4,6 +4,9 @@
 // 该阈值会自动考虑：
 //   - ChunkPreloadManager 的性能压力（区块即将加载时收紧）
 //   - 帧交错计数器（远处列车隔帧降距，Pixel 级别的频率降级）
+//
+// 性能：adjustedDistance() 的压力量在 onFrameStart() 中预计算，
+// 每帧只读一次 getPressure()，后续所有调用复用缓存值。
 
 package io.github.mmtr.client.lod;
 
@@ -24,11 +27,15 @@ public final class LODUtil {
 	// 用于实现帧交错：在部分帧上收紧渲染距离，达到远处物体降频效果
 	private static int mmtr$frameCounter = 0;
 
+	// 压力量缓存，在 onFrameStart() 中预计算；避免每帧数百次重复 getPressure() 调用
+	private static double cachedPressureFactor = 1.0;
+
 	private LODUtil() {}
 
-	// 每次渲染帧开始时调用，推进帧计数器
+	// 每次渲染帧开始时调用，推进帧计数器 + 刷新压力量缓存
 	public static void onFrameStart() {
-		mmtr$frameCounter++;
+		mmtr$frameCounter = (mmtr$frameCounter + 1) & 0x3FFFFFFF;
+		cachedPressureFactor = 1.0 - ChunkPreloadManager.INSTANCE.getPressure() * 0.5;
 	}
 
 	// 获取调整后的渲染距离（简洁版，不带帧交错）
@@ -38,11 +45,10 @@ public final class LODUtil {
 
 	// 获取调整后的渲染距离（完整版）
 	//   baseDistance   — 配置中的基础距离
-	//   applyInterlace — 是否应用帧交错降距
+	//   applyInterlace — 是否应用帧交错降距（仅车辆渲染使用）
 	// 返回值：经过性能压力和帧交错缩放后的实际距离，最低 32 格
 	public static int adjustedDistance(int baseDistance, boolean applyInterlace) {
-		double pressure = ChunkPreloadManager.INSTANCE.getPressure();
-		double factor = 1.0 - pressure * 0.5;
+		double factor = cachedPressureFactor;
 
 		if (applyInterlace && MmtrConfig.getInstance().enableRenderFrequencyReduction) {
 			int cycle = MmtrConfig.getInstance().distantVehicleFrameCycle;
@@ -54,7 +60,7 @@ public final class LODUtil {
 		return Math.max((int) (baseDistance * factor), 32);
 	}
 
-	// 判断列车 LOD 等级
+	// 判断列车 LOD 等级（应用帧交错）
 	public static LODLevel getVehicleLOD(Vector3d playerPos, Vector vehiclePos) {
 		if (playerPos == null || vehiclePos == null) return LODLevel.CULLED;
 		return getVehicleLOD(
@@ -69,15 +75,17 @@ public final class LODUtil {
 
 		double dx = px - vx, dy = py - vy, dz = pz - vz;
 		double distSq = dx * dx + dy * dy + dz * dz;
-		int fullDist = adjustedDistance(cfg.vehicleFullRenderDistance);
-		int maxDist  = adjustedDistance(cfg.vehicleMaxRenderDistance);
+
+		// 车辆距离判断应用帧交错降距
+		int fullDist = adjustedDistance(cfg.vehicleFullRenderDistance, true);
+		int maxDist  = adjustedDistance(cfg.vehicleMaxRenderDistance, true);
 
 		if (distSq <= (double) fullDist * fullDist) return LODLevel.FULL;
 		else if (distSq <= (double) maxDist * maxDist) return LODLevel.SIMPLIFIED;
 		else return LODLevel.CULLED;
 	}
 
-	// 判断方块实体是否应在当前帧渲染
+	// 判断方块实体是否应在当前帧渲染（不应用帧交错）
 	public static boolean shouldRenderBlockEntity(
 			double px, double py, double pz,
 			double bx, double by, double bz) {
@@ -89,7 +97,7 @@ public final class LODUtil {
 		return (dx * dx + dy * dy + dz * dz) <= (double) maxDist * maxDist;
 	}
 
-	// 判断电梯是否应在当前帧渲染
+	// 判断电梯是否应在当前帧渲染（不应用帧交错）
 	public static boolean shouldRenderLift(Vector3d playerPos, double lx, double ly, double lz) {
 		MmtrConfig cfg = MmtrConfig.getInstance();
 		if (!cfg.enableLiftCulling) return true;
@@ -101,7 +109,7 @@ public final class LODUtil {
 		return (dx * dx + dy * dy + dz * dz) <= (double) maxDist * maxDist;
 	}
 
-	// 同步等级（给 MinecraftClientDataMixin 使用）
+	// 同步等级（给 MinecraftClientDataMixin 使用，不应用帧交错）
 	public enum SyncLevel { SYNC_FULL, SYNC_REDUCED, SYNC_NONE }
 
 	public static SyncLevel getSyncLevel(double px, double pz, double tx, double tz) {

@@ -6,6 +6,7 @@
 package io.github.mmtr.client.mixin;
 
 import io.github.mmtr.client.lod.LODUtil;
+import io.github.mmtr.client.util.MtrItemUtil;
 import io.github.mmtr.config.MmtrConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
@@ -32,7 +33,7 @@ public abstract class MinecraftClientDataMixin {
 		if (player == null) return;
 
 		// 手持 MTR 物品时不节流（玩家在操作列车/建筑轨道）
-		if (mmtr$isHoldingMtrItem(player)) return;
+		if (MtrItemUtil.isHoldingMtrItem(player)) return;
 
 		double px = player.getX(), pz = player.getZ();
 		MinecraftClientData self = (MinecraftClientData) (Object) this;
@@ -82,17 +83,5 @@ public abstract class MinecraftClientDataMixin {
 		return false;
 	}
 
-	@Unique
-	private static boolean mmtr$isHoldingMtrItem(Player player) {
-		var main = player.getMainHandItem();
-		if (!main.isEmpty() && mmtr$isMtrNamespace(main)) return true;
-		var off = player.getOffhandItem();
-		return !off.isEmpty() && mmtr$isMtrNamespace(off);
-	}
 
-	@Unique
-	private static boolean mmtr$isMtrNamespace(net.minecraft.world.item.ItemStack stack) {
-		var id = net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem());
-		return id != null && "mtr".equals(id.getNamespace());
-	}
 }

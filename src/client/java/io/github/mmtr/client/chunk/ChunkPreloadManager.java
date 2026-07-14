@@ -34,6 +34,13 @@ public final class ChunkPreloadManager {
     private double performancePressure = 0.0;
     private long lastTickTime = 0;
 
+    // 可复用的 ClientChunkManager 实例（避免每次检测都 new）
+    private ClientChunkManager cachedChunkManager = null;
+
+    // 清理计数器：每 200 tick 全量清理一次 previousPositions
+    private int cleanupCounter = 0;
+    private static final int CLEANUP_INTERVAL = 200;
+
     // 压力每 200ms 检测一次（避免每 tick 都做全量遍历）
     private static final long   TICK_INTERVAL_MS    = 200;
     // 低于此速度的列车视为静止，不做预测
@@ -49,6 +56,15 @@ public final class ChunkPreloadManager {
 
     public double getPressure() {
         return performancePressure;
+    }
+
+    // 重置所有状态（维度切换 / 世界重载时调用）
+    public void reset() {
+        performancePressure = 0.0;
+        previousPositions.clear();
+        lastTickTime = 0;
+        cachedChunkManager = null;
+        cleanupCounter = 0;
     }
 
     // 每 tick 调用一次（通过 Fabric ClientTickEvents 注册）
@@ -68,6 +84,19 @@ public final class ChunkPreloadManager {
         lastTickTime = now;
 
         MinecraftClientData data = MinecraftClientData.getInstance();
+
+        // 每 200 tick 定期清理已消失列车的旧位置记录
+        cleanupCounter++;
+        if (cleanupCounter >= CLEANUP_INTERVAL) {
+            cleanupCounter = 0;
+            previousPositions.clear();
+        }
+
+        // 复用 ClientChunkManager 实例避免对象分配
+        ClientChunkCache chunkCache = level.getChunkSource();
+        if (cachedChunkManager == null) {
+            cachedChunkManager = new ClientChunkManager(chunkCache);
+        }
 
         for (VehicleExtension vehicle : data.vehicles) {
             if (vehicle == null || !vehicle.isMoving()) continue;
@@ -97,9 +126,8 @@ public final class ChunkPreloadManager {
                 int chunkX = (int) Math.floor(aheadX / 16.0);
                 int chunkZ = (int) Math.floor(aheadZ / 16.0);
 
-                // 通过 MTR 的 ClientChunkManager 判断区块是否已加载
-                ClientChunkCache chunkCache = level.getChunkSource();
-                boolean loaded = new ClientChunkManager(chunkCache).isChunkLoaded(chunkX, chunkZ);
+                // 使用缓存的 ClientChunkManager 判断区块是否已加载
+                boolean loaded = cachedChunkManager.isChunkLoaded(chunkX, chunkZ);
                 if (!loaded) {
                     performancePressure = Math.min(1.0, performancePressure + PRESSURE_INC);
                 }
@@ -107,8 +135,8 @@ public final class ChunkPreloadManager {
             previousPositions.put(id, headPos);
         }
 
-        // 定期清理已消失列车的旧位置记录
-        if (previousPositions.size() > data.vehicles.size() * 2 + 10) {
+        // 无车辆时也清理 previousPositions，避免内存残留
+        if (data.vehicles.isEmpty()) {
             previousPositions.clear();
         }
     }

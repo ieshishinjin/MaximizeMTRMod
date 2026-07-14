@@ -36,6 +36,12 @@ public class MmtrConfig {
     // 电梯井的最大渲染距离。电梯模型面数较高但数量较少
     public int liftMaxRenderDistance = 80;
 
+
+    // 轨道（含节点和信号连接线）的最大渲染距离。
+    // 轨道数量多、绘制耗时长，适当降低可显著提升性能。
+    // 玩家手持有 MTR 物品时始终渲染不受此限制。
+    public int railMaxRenderDistance = 128;
+
     //  数据同步节流
 
     // 玩家在此距离内有列车/电梯时，保持正常的 HTTP 同步频率（每 tick）
@@ -60,12 +66,12 @@ public class MmtrConfig {
     // 沿列车前进方向预检测的区块数量（前方最多 N 个区块）
     public int preloadChunkCount = 5;
 
-    //  渲染帧交错（实验性 — 默认关闭）
+    //  渲染帧交错（实验性 — 默认开启）
 
     // 启用后每隔 N 帧跳过列车渲染，降低列车动画帧率以节省 GPU。
     // 所有列车同步降帧，不会闪烁，但近距离列车也会变卡顿。
-    // 此功能效果有限，默认关闭。
-    public boolean enableRenderFrequencyReduction = false;
+    // 此功能效果有限；默认开启后配合帧交错周期可降频远处列车渲染，近处不受影响。
+    public boolean enableRenderFrequencyReduction = true;
 
     // 帧交错周期：
     //   2 = 隔帧降距（远处列车每 2 帧完全渲染一次）

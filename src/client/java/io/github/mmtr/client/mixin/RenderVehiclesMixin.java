@@ -27,6 +27,7 @@ public abstract class RenderVehiclesMixin {
 
 	@Inject(method = MMTR_TARGET, at = @At("HEAD"), cancellable = true, remap = false)
 	private static void mmtr$beforeRenderVehicles(long timerMillis, Vector3d playerPos, CallbackInfo ci) {
+		LODUtil.onFrameStart();
 		MmtrConfig cfg = MmtrConfig.getInstance();
 		if (!cfg.enableDistanceLOD) return;
 
