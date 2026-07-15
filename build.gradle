@@ -13,8 +13,8 @@ repositories {
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
     maven {
-        name = "CurseForge"
-        url = "https://www.cursemaven.com"
+        name = "Modrinth"
+        url = "https://api.modrinth.com/maven"
     }
 }
 
@@ -38,8 +38,8 @@ dependencies {
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-    modImplementation "curse.maven:minecraft-transit-railway-266707:8244921"
-    modImplementation "curse.maven:modmenu-308702:5441535"
+    modImplementation "maven.modrinth:minecraft-transit-railway:FABRIC-4.0.5+1.20.4"
+    modImplementation "maven.modrinth:modmenu:9.2.0"
 	
 }
 
