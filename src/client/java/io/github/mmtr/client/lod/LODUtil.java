@@ -12,6 +12,9 @@ package io.github.mmtr.client.lod;
 
 import io.github.mmtr.client.chunk.ChunkPreloadManager;
 import io.github.mmtr.config.MmtrConfig;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.world.level.Level;
 import org.mtr.core.tool.Vector;
 import org.mtr.mapping.holder.Vector3d;
 
@@ -35,7 +38,20 @@ public final class LODUtil {
 	// 每次渲染帧开始时调用，推进帧计数器 + 刷新压力量缓存
 	public static void onFrameStart() {
 		mmtr$frameCounter = (mmtr$frameCounter + 1) & 0x3FFFFFFF;
-		cachedPressureFactor = 1.0 - ChunkPreloadManager.INSTANCE.getPressure() * 0.5;
+		cachedPressureFactor = (1.0 - ChunkPreloadManager.INSTANCE.getPressure() * 0.5)
+				* getDimensionFactor();
+	}
+
+	// 根据当前维度返回距离缩放系数：
+	//   主世界 → 1.0（全距）
+	//   下界/末地/自定义 → 0.6（收紧 40%，这些维度极少有 MTR 轨道和列车）
+	private static double getDimensionFactor() {
+		Minecraft mc = Minecraft.getInstance();
+		ClientLevel level = mc.level;
+		if (level != null && level.dimension() != Level.OVERWORLD) {
+			return 0.6;
+		}
+		return 1.0;
 	}
 
 	// 获取调整后的渲染距离（简洁版，不带帧交错）

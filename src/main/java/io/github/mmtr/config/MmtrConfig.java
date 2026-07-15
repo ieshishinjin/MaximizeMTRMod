@@ -102,6 +102,25 @@ public class MmtrConfig {
     // 用于调参时验证优化效果
     public boolean debugRenderDistance = false;
 
+    //  配置值校验：确保所有距离和间隔在合理范围内
+    private void validate() {
+        vehicleFullRenderDistance   = clamp(vehicleFullRenderDistance, 8, 512);
+        vehicleMaxRenderDistance    = clamp(vehicleMaxRenderDistance, 16, 512);
+        blockEntityMaxRenderDistance = clamp(blockEntityMaxRenderDistance, 4, 256);
+        liftMaxRenderDistance       = clamp(liftMaxRenderDistance, 4, 256);
+        railMaxRenderDistance       = clamp(railMaxRenderDistance, 16, 512);
+        fullSyncDistance            = clamp(fullSyncDistance, 8, 512);
+        reducedSyncDistance         = clamp(reducedSyncDistance, 8, 512);
+        reducedSyncInterval         = clamp(reducedSyncInterval, 1, 200);
+        noSyncDistance              = clamp(noSyncDistance, 16, 1024);
+        preloadChunkCount           = clamp(preloadChunkCount, 1, 50);
+        distantVehicleFrameCycle    = Math.max(1, distantVehicleFrameCycle);
+    }
+
+    private static int clamp(int value, int min, int max) {
+        return Math.max(min, Math.min(max, value));
+    }
+
     //  单例 + 持久化
     public static MmtrConfig getInstance() {
         if (INSTANCE == null) INSTANCE = load();
@@ -119,6 +138,7 @@ public class MmtrConfig {
                 String json = Files.readString(CONFIG_PATH);
                 MmtrConfig cfg = GSON.fromJson(json, MmtrConfig.class);
                 if (cfg != null) {
+                    cfg.validate();
                     LOGGER.info("Loaded config from {}", CONFIG_PATH.toAbsolutePath());
                     return cfg;
                 }

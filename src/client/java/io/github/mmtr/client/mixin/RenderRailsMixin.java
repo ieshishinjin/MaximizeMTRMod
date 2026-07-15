@@ -48,10 +48,18 @@ public abstract class RenderRailsMixin {
 		for (var wrapper : data.railWrapperList.values()) {
 			if (wrapper == null) continue;
 			var sv = wrapper.startVector;
-			if (sv != null && (px - sv.x) * (px - sv.x) + (pz - sv.z) * (pz - sv.z) <= maxDistSq) return;
 			var ev = wrapper.endVector;
-			if (ev != null && (px - ev.x) * (px - ev.x) + (pz - ev.z) * (pz - ev.z) <= maxDistSq) return;
+			if (sv != null && rangeSq(px, pz, sv.x, sv.z) <= maxDistSq) return;
+			if (ev != null && rangeSq(px, pz, ev.x, ev.z) <= maxDistSq) return;
+			if (sv != null && ev != null && rangeSq(px, pz, (sv.x + ev.x) * 0.5, (sv.z + ev.z) * 0.5) <= maxDistSq) return;
 		}
 		ci.cancel();
+	}
+
+	// 二维距离平方（内联工具方法，避免重复写公式）
+	@Unique
+	private static double rangeSq(double px, double pz, double tx, double tz) {
+		double dx = px - tx, dz = pz - tz;
+		return dx * dx + dz * dz;
 	}
 }

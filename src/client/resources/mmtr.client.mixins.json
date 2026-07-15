@@ -3,7 +3,6 @@
     "package": "io.github.mmtr.client.mixin",
     "compatibilityLevel": "JAVA_17",
     "client": [
-        "mmtrClientMixin",
         "RenderVehiclesMixin",
         "MTRBlockEntityRendererMixin",
         "RenderLiftsMixin",
